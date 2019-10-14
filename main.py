@@ -1,4 +1,6 @@
-import os, re, sympy
+import os
+import re
+import sympy
 from datetime import datetime as dt
 from requests import Session
 from pendulum import datetime, period
@@ -94,7 +96,7 @@ class JournalOfficielScraper:
 
         session = Session()
 
-        def data_available(date, doc):
+        def data_is_available(date, doc):
             r = session.post(url=f"{hostname}/eli/jo/{date}/")
             webpage = fromstring(r.content)
             links = webpage.xpath(f"//a[contains(text(), '{label[doc]}')]")
@@ -141,7 +143,7 @@ class JournalOfficielScraper:
             self.r = r
             self.endpoint = endpoint
 
-        if data_available(date, doc):
+        if data_is_available(date, doc):
             get_data(self.r, self.endpoint)
         else:
             self.alert(date, "no_data")

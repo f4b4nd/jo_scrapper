@@ -7,4 +7,4 @@ if __name__ == '__main__':
 
     jo_scraper = JOScraper(start, end)
     for date in jo_scraper.period():
-        jo_scraper.run(date, 'Decrets')
+        jo_scraper.run(date, 'Demandes')

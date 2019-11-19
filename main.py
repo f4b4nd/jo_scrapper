@@ -6,5 +6,5 @@ if __name__ == '__main__':
     end = input('Enter ending date in DD/MM/YYYY: ')
 
     jo_scraper = JOScraper(start, end)
-    for date in jo_scraper.dates():
+    for date in jo_scraper.period():
         jo_scraper.run(date, 'Décrets')

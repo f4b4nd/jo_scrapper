@@ -3,7 +3,7 @@ import re
 import sympy
 from datetime import datetime as dt
 from requests import Session
-from pendulum import datetime, period
+import pendulum as pnd
 from lxml.html import fromstring
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
@@ -15,12 +15,12 @@ class JOScraper:
         self.start = start
         self.end = end
 
-    def dates(self):
+    def period(self):
         d1, m1, y1 = self.start.split("/")
         d2, m2, y2 = self.end.split("/")
-        start = datetime(int(y1), int(m1), int(d1))
-        end = datetime(int(y2), int(m2), int(d2))
-        dates = period(start, end)
+        start = pnd.datetime(int(y1), int(m1), int(d1))
+        end = pnd.datetime(int(y2), int(m2), int(d2))
+        dates = pnd.period(start, end)
         return [dt.strftime(x, r'%Y/%#m/%#d') for x in dates.range('days')]
 
     def d8format(self, date):

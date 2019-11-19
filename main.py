@@ -1,4 +1,4 @@
-from journalofficielscraper import JOScraper
+from journalofficiel.scraper import JOScraper
 
 if __name__ == '__main__':
 

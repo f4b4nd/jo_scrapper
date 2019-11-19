@@ -5,13 +5,13 @@ from datetime import datetime as dt
 from requests import Session
 import pendulum as pnd
 from lxml.html import fromstring
-
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+import pathlib
 
 
 class JOScraper:
 
     def __init__(self, start, end):
+        self.root = pathlib.Path(__file__).resolve().parent.parent
         self.start = start
         self.end = end
 
@@ -79,7 +79,7 @@ class JOScraper:
 
     def save_pdf(self, date, doc, content):
         y_m_d = self.d8format(date)["y_m_d"]
-        filepath = f"pdf/{doc}/{y_m_d}.pdf"
+        filepath = self.root / "pdf" / doc / f"{y_m_d}.pdf"
         file_exists = os.path.exists(filepath)
 
         if not file_exists:

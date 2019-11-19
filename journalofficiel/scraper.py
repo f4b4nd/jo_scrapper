@@ -121,8 +121,8 @@ class JOScraper:
 
         def get_data(r, endpoint):
             r = session.post(url=f"{hostname}/{endpoint}", cookies=r.cookies)
-            webpage = fromstring(r.content)
-            links = webpage.xpath("//a[contains(text(), "
+            web_page = fromstring(r.content)
+            links = web_page.xpath("//a[contains(text(), "
                                   "\"Accéder à l'espace protégé\")]")
             endpoint = links[0].attrib['href']
 

@@ -78,7 +78,9 @@ class JOScraper:
         return result
 
     def save_pdf(self, date, doc, content):
+
         self.create_dir_if_not_exists(f"pdf/{doc}")
+
         y_m_d = self.d8format(date)["y_m_d"]
         filepath = self.root / "pdf" / doc / f"{y_m_d}.pdf"
         file_exists = os.path.exists(filepath)

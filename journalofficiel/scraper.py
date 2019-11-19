@@ -117,7 +117,8 @@ class JOScraper:
 
             update_request(r, endpoint)
             captcha = get_captcha(self.r, self.endpoint)
-            post_payload(self.r, self.endpoint, self.captcha_solver(captcha))
+            post_captcha_payload(self.r, self.endpoint,
+                                 self.captcha_solver(captcha))
             self.save_pdf(date, doc, self.r.content)
 
         def get_captcha(r, endpoint):
@@ -128,7 +129,7 @@ class JOScraper:
             captcha = re.sub(r"\t|\n|\r|\s+", "", captcha)
             return captcha
 
-        def post_payload(r, endpoint, payload):
+        def post_captcha_payload(r, endpoint, payload):
             r = session.post(url=f"{hostname}/{endpoint}",
                              data={'captcha': payload,
                                    'bouton': 'Soumettre la réponse'},

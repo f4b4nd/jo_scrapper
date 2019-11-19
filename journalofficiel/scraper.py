@@ -82,11 +82,11 @@ class JOScraper:
         self.create_dir_if_not_exists(f"pdf/{doc}")
 
         y_m_d = self.d8format(date)["y_m_d"]
-        filepath = self.root / "pdf" / doc / f"{y_m_d}.pdf"
-        file_exists = os.path.exists(filepath)
+        file_path = self.root / "pdf" / doc / f"{y_m_d}.pdf"
+        file_exists = os.path.exists(file_path)
 
         if not file_exists:
-            open(filepath, 'wb').write(content)
+            open(file_path, 'wb').write(content)
             self.alert(date, "success")
         else:
             self.alert(date, "already_exists")
@@ -109,8 +109,8 @@ class JOScraper:
 
         def data_is_available(date, doc):
             r = session.post(url=f"{hostname}/eli/jo/{date}/")
-            webpage = fromstring(r.content)
-            links = webpage.xpath(f"//a[contains(text(), '{label[doc]}')]")
+            web_page = fromstring(r.content)
+            links = web_page.xpath(f"//a[contains(text(), '{label[doc]}')]")
 
             if links == []:
                 return False
@@ -134,8 +134,8 @@ class JOScraper:
 
         def get_captcha(r, endpoint):
             r = session.post(url=f"{hostname}/{endpoint}", cookies=r.cookies)
-            webpage = fromstring(r.content)
-            captcha = webpage.xpath("//input[@name='captcha']/../text()")
+            web_page = fromstring(r.content)
+            captcha = web_page.xpath("//input[@name='captcha']/../text()")
             captcha = "".join(captcha)
             captcha = re.sub(r"\t|\n|\r|\s+", "", captcha)
             return captcha

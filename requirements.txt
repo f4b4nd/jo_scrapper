@@ -1,3 +1,4 @@
 lxml==4.4.1
 pendulum==2.0.5
+requests==2.22.0
 sympy==1.4

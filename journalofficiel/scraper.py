@@ -78,6 +78,7 @@ class JOScraper:
         return result
 
     def save_pdf(self, date, doc, content):
+        self.create_dir_if_not_exists(doc)
         y_m_d = self.d8format(date)["y_m_d"]
         filepath = self.root / "pdf" / doc / f"{y_m_d}.pdf"
         file_exists = os.path.exists(filepath)
@@ -88,10 +89,18 @@ class JOScraper:
         else:
             self.alert(date, "already_exists")
 
+    def create_dir_if_not_exists(self, doc):
+        dir_path = self.root / "pdf" / doc
+        dir_exists = os.path.exists(dir_path)
+
+        if not dir_exists:
+            os.makedirs(dir_path)
+            print("# New directory created", end=" ")
+
     def run(self, date, doc):
 
         hostname = 'https://www.legifrance.gouv.fr'
-        label = {'Décrets': 'portant changements de noms',
+        label = {'Decrets': 'portant changements de noms',
                  'Demandes': 'Demandes de changement'}
 
         session = Session()

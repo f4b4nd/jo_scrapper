@@ -1,5 +1,8 @@
-pdf/Décrets/*
-pdf/Demandes/*
 .vscode/
-trash/
+
 __pycache__/
+
+
+*.pdf
+
+trash/

@@ -14,7 +14,7 @@ def dates(start: str, end: str) -> list:
 
 def today():
   today = dt.date.today()
-  return today.strftime("%d/%m/%Y")
+  return today.strftime(r"%d/%m/%Y")
 
 
 parser = argparse.ArgumentParser()

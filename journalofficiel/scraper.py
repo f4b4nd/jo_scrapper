@@ -178,6 +178,6 @@ class Alert:
             "already_exists": f"# File already exists for {self.ddmmyy}",
             "no_data": f"No data on {self.ddmmyy}",
         }
-        status = alerts[self.status] if self.status in alerts else ""
+        status = alerts[status] if status in alerts else ""
         print(status)
  

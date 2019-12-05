@@ -137,7 +137,7 @@ class JOScraper:
             save_pdf = SavePDF(self.dirpath(doc), self.filename(date), content)
             save_pdf.run()
         else:
-            alert = Alert(date)
+            alert = Alert(self.d8format(date)["d/m/y"])
             alert.run("no_data")
 
             
@@ -147,17 +147,17 @@ class SavePDF:
         self.dirpath = dirpath
         self.filename = filename
         self.content = content
-        self.filepath = f"{dirpath}/{filename}"
+        self.filepath = dirpath / filename
         
     @staticmethod
     def create_dir(dirpath):
-        if not os.path.exists(dirpath):
+        if not os.path.isdir(dirpath):
             os.makedirs(dirpath)
             print("# New directory created", end=" ")
     
     @staticmethod
     def file_exists(filepath):
-        return os.path.exist(filepath)
+        return os.path.exists(filepath)
     
     def run(self):
         
@@ -179,7 +179,7 @@ class Alert:
         
     def run(self, status):
         alerts = {
-            "success": f"# New file created for {self.ddmmyy}! ",
+            "success": f"# File {self.ddmmyy} created !",
             "already_exists": f"# File already exists for {self.ddmmyy}",
             "no_data": f"No data on {self.ddmmyy}",
         }

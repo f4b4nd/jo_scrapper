@@ -11,10 +11,10 @@ import pathlib
 class JOScraper:
 
     def __init__(self, start, end):
-        self.root = pathlib.Path(__file__).resolve().parent.parent
+        self.ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
         self.start = start
         self.end = end
-
+        
     def period(self):
         d1, m1, y1 = self.start.split("/")
         d2, m2, y2 = self.end.split("/")
@@ -23,20 +23,18 @@ class JOScraper:
         dates = pnd.period(start, end)
         return [dt.strftime(x, r'%Y/%#m/%#d') for x in dates.range('days')]
 
+    def filename(self, date):
+        y_m_d = self.d8format(date)["y_m_d"]
+        return f"{y_m_d}.pdf"
+    
+    def dirpath(self, doc):
+        return self.ROOT_DIR / "pdf" / doc
+        
     def d8format(self, date):
         d8 = dt.strptime(date, r'%Y/%m/%d')
         ddmmyy = d8.strftime(r'%d/%m/%Y')
         y_m_d = d8.strftime(r'%Y_%m_%d')
         return {"d/m/y": ddmmyy, "y_m_d": y_m_d}
-
-    def alert(self, date, status):
-        ddmmyy = self.d8format(date)["d/m/y"]
-        alerts = {
-            "success": f"# New file created for {ddmmyy}! ",
-            "already_exists": f"# File already exists for {ddmmyy}",
-            "no_data": f"No data on {ddmmyy}",
-        }
-        print(alerts[status])
 
     def captcha_solver(self, captcha):
 
@@ -77,28 +75,6 @@ class JOScraper:
 
         return result
 
-    def save_pdf(self, date, doc, content):
-
-        self.create_dir_if_not_exists(f"pdf/{doc}")
-
-        y_m_d = self.d8format(date)["y_m_d"]
-        file_path = self.root / "pdf" / doc / f"{y_m_d}.pdf"
-        file_exists = os.path.exists(file_path)
-
-        if not file_exists:
-            open(file_path, 'wb').write(content)
-            self.alert(date, "success")
-        else:
-            self.alert(date, "already_exists")
-
-    def create_dir_if_not_exists(self, path):
-        dir_path = self.root / path
-        dir_exists = os.path.exists(dir_path)
-
-        if not dir_exists:
-            os.makedirs(dir_path)
-            print("# New directory created", end=" ")
-
     def run(self, date, doc):
 
         hostname = 'https://www.legifrance.gouv.fr'
@@ -130,7 +106,7 @@ class JOScraper:
             captcha = get_captcha(self.r, self.endpoint)
             post_captcha_payload(self.r, self.endpoint,
                                  self.captcha_solver(captcha))
-            self.save_pdf(date, doc, self.r.content)
+            return self.r.content
 
         def get_captcha(r, endpoint):
             r = session.post(url=f"{hostname}/{endpoint}", cookies=r.cookies)
@@ -157,6 +133,51 @@ class JOScraper:
                 self.endpoint = endpoint
 
         if data_is_available(date, doc):
-            get_data(self.r, self.endpoint)
+            content = get_data(self.r, self.endpoint)
+            save_pdf = SavePDF(self.dirpath(doc), self.filename(date), content)
+            save_pdf.run()
         else:
-            self.alert(date, "no_data")
+            alert = Alert(date)
+            alert.run("no_data")
+
+            
+class SavePDF:
+    
+    def __init__(self, dirpath, filename, content):
+        self.dirpath = dirpath
+        self.filename = filename
+        self.content = content
+        
+    def create_dir_if_not_exists(self):
+        if not os.path.exists(self.dirpath):
+            os.makedirs(self.dirpath)
+            print("# New directory created", end=" ")
+            
+    def run(self):
+        
+        self.create_dir_if_not_exists(f"{self.dirpath}")
+        file_exists = os.path.exists(f"{self.dirpath(doc)}/{self.filename}")
+        
+        alert = Alert(self.filename)
+        
+        if not file_exists:
+            open(file_path, 'wb').write(self.content)
+            alert.run("success")
+        else:
+            alert.run("already_exists")
+            
+            
+class Alert:
+    
+    def __init__(self, ddmmyy):
+        self.ddmmyy = ddmmyy
+        
+    def run(self, status):
+        alerts = {
+            "success": f"# New file created for {self.ddmmyy}! ",
+            "already_exists": f"# File already exists for {self.ddmmyy}",
+            "no_data": f"No data on {self.ddmmyy}",
+        }
+        status = alerts[self.status] if self.status in alerts else ""
+        print(status)
+ 

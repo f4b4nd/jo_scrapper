@@ -156,7 +156,7 @@ class SavePDF:
             print("# New directory created", end=" ")
     
     @staticmethod
-    def file_exist(filepath):
+    def file_exists(filepath):
         return os.path.exist(filepath)
     
     def run(self):

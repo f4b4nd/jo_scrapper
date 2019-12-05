@@ -147,21 +147,26 @@ class SavePDF:
         self.dirpath = dirpath
         self.filename = filename
         self.content = content
+        self.filepath = dirpath / filename
         
-    def create_dir_if_not_exists(self):
-        if not os.path.exists(self.dirpath):
-            os.makedirs(self.dirpath)
+    @staticmethod
+    def create_dir(dirpath):
+        if not os.path.exists(dirpath):
+            os.makedirs(dirpath)
             print("# New directory created", end=" ")
-            
+    
+    @staticmethod
+    def file_exist(filepath):
+        return os.path.exist(filepath)
+    
     def run(self):
         
-        self.create_dir_if_not_exists(f"{self.dirpath}")
-        file_exists = os.path.exists(f"{self.dirpath(doc)}/{self.filename}")
-        
+        self.create_dir(self.dirpath)
+   
         alert = Alert(self.filename)
         
-        if not file_exists:
-            open(file_path, 'wb').write(self.content)
+        if not self.file_exists(self.filepath):
+            open(self.filepath, 'wb').write(self.content)
             alert.run("success")
         else:
             alert.run("already_exists")

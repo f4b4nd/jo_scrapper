@@ -3,7 +3,6 @@ import re
 import sympy
 from datetime import datetime as dt
 from requests import Session
-import pendulum as pnd
 from lxml.html import fromstring
 import pathlib
 from journalofficiel.alerts import Alert
@@ -12,31 +11,15 @@ from journalofficiel.savepdf import SavePDF
 
 class JOScraper:
 
-    def __init__(self, start, end):
+    def __init__(self):
         self.ROOT_DIR = pathlib.Path(__file__).resolve().parent.parent
-        self.start = start
-        self.end = end
-        
-    def period(self):
-        d1, m1, y1 = self.start.split("/")
-        d2, m2, y2 = self.end.split("/")
-        start = pnd.datetime(int(y1), int(m1), int(d1))
-        end = pnd.datetime(int(y2), int(m2), int(d2))
-        dates = pnd.period(start, end)
-        return [dt.strftime(x, r'%Y/%#m/%#d') for x in dates.range('days')]
 
     def filename(self, date):
-        y_m_d = self.d8format(date)["y_m_d"]
+        y_m_d = date.strftime(r'%Y_%m_%d')
         return f"{y_m_d}.pdf"
     
     def dirpath(self, doc):
         return self.ROOT_DIR / "pdf" / doc
-        
-    def d8format(self, date):
-        d8 = dt.strptime(date, r'%Y/%m/%d')
-        ddmmyy = d8.strftime(r'%d/%m/%Y')
-        y_m_d = d8.strftime(r'%Y_%m_%d')
-        return {"d/m/y": ddmmyy, "y_m_d": y_m_d}
 
     def captcha_solver(self, captcha):
 
@@ -86,6 +69,7 @@ class JOScraper:
         session = Session()
 
         def data_is_available(date, doc):
+            date = date.strftime(r'%Y/%#m/%#d')
             r = session.post(url=f"{hostname}/eli/jo/{date}/")
             web_page = fromstring(r.content)
             links = web_page.xpath(f"//a[contains(text(), '{label[doc]}')]")
@@ -139,5 +123,5 @@ class JOScraper:
             save_pdf = SavePDF(self.dirpath(doc), self.filename(date), content)
             save_pdf.run()
         else:
-            alert = Alert(self.d8format(date)["d/m/y"])
+            alert = Alert(date.strftime(r"%d/%m/%Y"))
             alert.run("no_data")

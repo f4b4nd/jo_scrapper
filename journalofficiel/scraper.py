@@ -6,6 +6,8 @@ from requests import Session
 import pendulum as pnd
 from lxml.html import fromstring
 import pathlib
+from journalofficiel.alerts import Alert
+from journalofficiel.savepdf import SavePDF
 
 
 class JOScraper:
@@ -139,50 +141,3 @@ class JOScraper:
         else:
             alert = Alert(self.d8format(date)["d/m/y"])
             alert.run("no_data")
-
-            
-class SavePDF:
-    
-    def __init__(self, dirpath, filename, content):
-        self.dirpath = dirpath
-        self.filename = filename
-        self.content = content
-        self.filepath = dirpath / filename
-        
-    @staticmethod
-    def create_dir(dirpath):
-        if not os.path.isdir(dirpath):
-            os.makedirs(dirpath)
-            print("# New directory created", end=" ")
-    
-    @staticmethod
-    def file_exists(filepath):
-        return os.path.exists(filepath)
-    
-    def run(self):
-        
-        self.create_dir(self.dirpath)
-   
-        alert = Alert(self.filename)
-        
-        if not self.file_exists(self.filepath):
-            open(self.filepath, 'wb').write(self.content)
-            alert.run("success")
-        else:
-            alert.run("already_exists")
-            
-            
-class Alert:
-    
-    def __init__(self, ddmmyy):
-        self.ddmmyy = ddmmyy
-        
-    def run(self, status):
-        alerts = {
-            "success": f"# File {self.ddmmyy} created !",
-            "already_exists": f"# File already exists for {self.ddmmyy}",
-            "no_data": f"No data on {self.ddmmyy}",
-        }
-        status = alerts[status] if status in alerts else ""
-        print(status)
- 

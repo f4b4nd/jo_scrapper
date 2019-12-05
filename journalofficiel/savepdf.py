@@ -1,6 +1,7 @@
 import os
 from journalofficiel.alerts import Alert
 
+
 class SavePDF:
     
     def __init__(self, dirpath, filename, content):

@@ -2,7 +2,7 @@ import os
 from journalofficiel.alerts import Alert
 
 
-class SavePDF:
+class SaveFile:
     
     def __init__(self, dirpath, filename, content):
         self.dirpath = dirpath

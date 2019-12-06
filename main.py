@@ -1,15 +1,14 @@
 from journalofficiel.scraper import JOScraper
 import argparse
 import datetime as dt
-import pendulum as pnd
 
 
 def dates(start: str, end: str) -> list:
-    d1, m1, y1 = start.split("/")
-    d2, m2, y2 = end.split("/")
-    start = pnd.datetime(int(y1), int(m1), int(d1))
-    end = pnd.datetime(int(y2), int(m2), int(d2))
-    return pnd.period(start, end)
+    start = dt.datetime.strptime(start, r"%d/%m/%Y")
+    end = dt.datetime.strptime(end, r"%d/%m/%Y")
+    delta = end - start
+    dates = [start + dt.timedelta(days=i) for i in range(delta.days+1)]
+    return dates
 
 
 def today():

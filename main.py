@@ -2,9 +2,18 @@ from journalofficiel.scraper import JOScraper
 import argparse
 import datetime as dt
 
+def add_current_year(date) -> dt.datetime:
+    year = dt.date.today().strftime('%Y')
+    date = dt.datetime.strptime(date, r"%d/%m")
+    return date.replace(year=int(year))
+     
 
 def dates(start: str, end: str) -> list:
-    start = dt.datetime.strptime(start, r"%d/%m/%Y")
+    try:
+        start = dt.datetime.strptime(start, r"%d/%m/%Y")
+    except ValueError:
+        start = add_current_year(start)
+        
     end = dt.datetime.strptime(end, r"%d/%m/%Y")
     delta = end - start
     dates = [start + dt.timedelta(days=i) for i in range(delta.days+1)]
@@ -17,7 +26,7 @@ def today():
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("start", help="starting date in DD/MM/YYYY", type=str)
+parser.add_argument("start", help="starting date in DD/MM/YYYY, or DD/MM for current year", type=str)
 parser.add_argument("--end", default=today(),
                     help="ending date in DD/MM/YYYY", type=str)
 parser.add_argument("--doc", default='Decrets',

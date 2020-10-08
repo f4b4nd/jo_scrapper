@@ -3,6 +3,7 @@ import re
 import sympy
 from requests import Session
 from lxml.html import fromstring
+from lxml import etree
 import pathlib
 from journalofficiel.alerts import Alert
 from journalofficiel.savefile import SaveFile
@@ -65,17 +66,33 @@ class JOScraper:
         hostname = 'https://www.legifrance.gouv.fr'
         label = {'Decrets': 'portant changements de noms',
                  'Demandes': 'Demandes de changement'}
-
+        headers = {
+            'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
+        }
+        
         def data_is_available(date, doc):
-            date = date.strftime(r'%Y/%#m/%#d')
-            r = self.session.post(url=f"{hostname}/eli/jo/{date}/")
+            """
+            TODO: aim url looking like:
+                - www.legifrance.gouv.fr/jorf/jo/2020/10/6/0243
+                - www.legifrance.gouv.fr/eli/jo/2020/10/6/0243
+            PB: webpage content is generated with javascript -> Need to use Selenium ? (w/ chrome headless mode)
+            """
+            date = date.strftime(r'%Y/%m/%d')
+            r = self.session.post(url=f"{hostname}/jorf/jo/{date}/0244", headers=headers) 
             web_page = fromstring(r.content)
-            links = web_page.xpath(f"//a[contains(text(), '{label[doc]}')]")
-
+            print(etree.tostring(web_page))
+            a_tags = web_page.xpath(f"//a")
+            print(f"{hostname}/jorf/jo/{date}/")
+            a_tags = [ str(etree.tostring(a_tags[i])) for i, x in enumerate(a_tags)]
+            print("\n".join(a_tags))
+            a_contains = web_page.xpath(f"//a[contains(text(), '{label[doc]}')]")
+            
             if links == []:
                 return False
             else:
                 endpoint = links[0].attrib['href']
+          
                 update_request(r, endpoint)
                 return True
 
